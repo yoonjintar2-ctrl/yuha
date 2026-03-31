@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>유하의 이유식 플랜</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#5BA06A; --gl:#E2F2E8; --gp:#F2FAF4;
+  --bg:#F3F7F4; --white:#fff;
+  --text:#1C2E22; --t2:#536B58; --t3:#98AFA2;
+  --bd:#BDD6C6; --bdl:#DDEEE4;
+  --red:#EF5350; --blue:#3B82F6;
+  --sh:0 4px 24px rgba(91,160,106,.1);
+  --sh-sm:0 2px 12px rgba(91,160,106,.07);
+  --r:16px; --r-sm:10px;
+}
+body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--text);padding:12px;min-height:100vh;overflow-x:hidden}
+@media(max-width:600px){body{padding:6px 4px}}
+
+/* ── Header ── */
+.app-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
+.app-title{font-size:1.25rem;font-weight:900;color:var(--g);letter-spacing:-.5px;display:flex;align-items:center;gap:6px}
+.header-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.btn{padding:7px 14px;border-radius:20px;border:none;cursor:pointer;font-size:.78rem;font-weight:700;font-family:inherit;transition:all .18s;letter-spacing:-.2px}
+.btn-primary{background:var(--g);color:#fff}
+.btn-primary:hover{background:#4a8a59;transform:translateY(-1px);box-shadow:0 4px 14px rgba(91,160,106,.35)}
+.btn-ghost{background:var(--gl);color:var(--g)}
+.btn-ghost:hover{background:var(--gp)}
+.btn-gray{background:#EAEFEC;color:var(--t2)}
+.btn-cancel{background:#EAEFEC;color:var(--t2)}
+.btn-danger{background:#FEECEC;color:var(--red)}
+.edit-badge{font-size:.68rem;background:#FEF3CD;color:#856404;padding:4px 10px;border-radius:20px;font-weight:700;white-space:nowrap}
+.icon-btn{width:34px;height:34px;background:var(--white);border:1.5px solid var(--bd);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem;transition:all .18s}
+.icon-btn:hover{background:var(--gp);border-color:var(--g)}
+
+/* ── Layout ── */
+.main-layout{display:grid;grid-template-columns:1fr 256px;gap:12px;align-items:start}
+@media(max-width:900px){.main-layout{grid-template-columns:1fr}}
+
+/* ── Calendar ── */
+.cal-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;min-width:0}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:linear-gradient(135deg,#CDECD8 0%,#C0E8CF 60%,#B4E4C6 100%)}
+.cal-nav-info{text-align:center;flex:1;min-width:0}
+.cal-nav-title{font-size:.95rem;font-weight:700;color:var(--text)}
+.cal-nav-sub{font-size:.62rem;color:var(--t2);margin-top:1px}
+.nav-arrow{width:32px;height:32px;background:rgba(255,255,255,.75);border:none;border-radius:8px;cursor:pointer;font-size:1.1rem;color:var(--g);font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0}
+.nav-arrow:hover{background:#fff;box-shadow:0 2px 8px rgba(91,160,106,.25)}
+
+/* ── Print button ── */
+.btn-print{background:#F0F4FF;color:#3B82F6;border:1.5px solid #BFCFE8}
+.btn-print:hover{background:#E4EDFF}
+@media print{
+  body{padding:0;background:#fff}
+  .app-header,.notice-col,.btn-print,.nav-arrow,.modal,.pw-overlay,.overlay,.toast{display:none!important}
+  .main-layout{display:block}
+  .cal-card{box-shadow:none;border-radius:0}
+  .cal-cell{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+/* ── Grid ── */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);width:100%}
+.day-header{text-align:center;padding:7px 1px;font-size:.65rem;font-weight:700;border-bottom:1.5px solid var(--bdl);background:#FAFCFB;color:var(--t2);letter-spacing:.3px}
+.day-header.sun{color:var(--red)}
+.day-header.sat{color:var(--blue)}
+.cal-cell{border-right:1px solid var(--bdl);border-bottom:1px solid var(--bdl);min-height:172px;padding:5px 4px 4px;cursor:pointer;transition:background .13s;position:relative;overflow:hidden;vertical-align:top;min-width:0}
+.cal-cell:nth-child(7n){border-right:none}
+@media(max-width:700px){.cal-cell{min-height:130px;padding:3px 3px 2px}}
+@media(max-width:400px){.cal-cell{min-height:100px;padding:2px 2px 2px}}
+.cal-cell:hover{background:var(--gp)}
+.cal-cell.view-only{cursor:default}
+.cal-cell.view-only:hover{background:transparent}
+.cal-cell.today{background:var(--gp)!important;box-shadow:inset 0 0 0 2px var(--g)}
+.cal-cell.other-m{opacity:.4;background:#F7FAF8}
+.cell-top{display:flex;align-items:flex-start;justify-content:space-between;gap:2px;margin-bottom:2px}
+.cell-date{font-size:.72rem;font-weight:700;color:var(--t3);line-height:1;flex-shrink:0}
+.cal-cell.is-sun .cell-date,.cal-cell.is-hol .cell-date{color:var(--red)}
+.cal-cell.is-sat .cell-date{color:var(--blue)}
+.cal-cell.today .cell-date{color:var(--g)}
+.cell-ddays{font-size:.42rem;font-weight:300;color:var(--t3);line-height:1.3;text-align:right;letter-spacing:-.2px}
+.hol-name{font-size:.46rem;color:var(--red);display:block;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell-copy-btn{position:absolute;top:3px;right:3px;width:16px;height:16px;background:var(--gl);border:none;border-radius:4px;cursor:pointer;font-size:.5rem;color:var(--g);display:none;align-items:center;justify-content:center;z-index:2;padding:0}
+.cal-cell:hover .cell-copy-btn{display:flex}
+.cell-meals{margin-top:3px}
+.cell-meal-row{font-size:.56rem;color:var(--t2);line-height:1.45;display:flex;align-items:baseline;gap:3px;flex-wrap:wrap}
+.cell-meal-tag{font-size:.48rem;font-weight:700;color:var(--white);background:var(--g);border-radius:3px;padding:0px 3px;flex-shrink:0;line-height:1.6}
+.cell-meal-tag.lunch{background:#4A90A4}
+.cell-meal-tag.dinner{background:#8B6BA0}
+.cell-meal-tag.snack{background:#D4820A}
+.cell-meal-items{color:var(--t2);flex:1}
+.cell-item-line{font-size:.55rem;color:var(--t2);line-height:1.5;display:flex;align-items:baseline;gap:2px}
+.cell-item-line::before{content:"·";color:var(--g);font-weight:700;flex-shrink:0;font-size:.65rem}
+.cell-memo-preview{font-size:.5rem;color:var(--t3);margin-top:2px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+
+/* ── Notice Board ── */
+.notice-col{display:flex;flex-direction:column;gap:10px}
+.n-card{background:var(--white);border-radius:var(--r);box-shadow:var(--sh-sm);padding:12px 14px}
+.n-title{font-size:.66rem;font-weight:800;color:var(--g);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+
+/* Compact weather */
+.weather-compact{display:flex;align-items:center;gap:10px}
+.w-icon{font-size:1.6rem;line-height:1}
+.w-temp{font-size:1.1rem;font-weight:800;line-height:1}
+.w-desc{font-size:.65rem;color:var(--t2);margin-top:1px}
+.w-date{font-size:.64rem;color:var(--t3);margin-bottom:6px}
+.dust-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.d-badge{font-size:.62rem;padding:2px 8px;border-radius:9px;font-weight:700}
+.d-good{background:#E8F5E9;color:#2E7D32}
+.d-moderate{background:#FFF8E1;color:#F57F17}
+.d-bad{background:#FFEBEE;color:#C62828}
+.d-very-bad{background:#F3E5F5;color:#6A1B9A}
+
+/* Compact dday */
+.dday-compact{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dday-num{font-size:1.6rem;font-weight:900;color:var(--g);letter-spacing:-1px;line-height:1}
+.dday-detail{font-size:.65rem;color:var(--t2);line-height:1.7}
+.dday-lbl{font-size:.6rem;color:var(--t3);margin-top:2px}
+
+/* Notepad */
+.notepad-ta{width:100%;padding:8px 10px;border:1.5px solid var(--bd);border-radius:var(--r-sm);font-size:.78rem;resize:vertical;min-height:90px;font-family:inherit;color:var(--text);line-height:1.7}
+.notepad-ta:focus{outline:none;border-color:var(--g)}
+.notepad-save{width:100%;margin-top:6px;padding:7px;font-size:.75rem}
+
+/* Tips */
+.tip-items{font-size:.7rem;color:var(--text);line-height:1.8;margin-top:2px}
+.tip-items li{padding-left:14px;position:relative;list-style:none}
+.tip-items li::before{content:"·";font-size:.9rem;font-weight:700;color:var(--g);position:absolute;left:2px;top:0}
+
+/* Foods */
+.food-total{font-size:.75rem;font-weight:700;color:var(--g);margin-bottom:6px}
+.food-chips{display:flex;flex-wrap:wrap;gap:4px}
+.f-chip{font-size:.6rem;background:var(--gp);color:var(--t2);padding:2px 7px;border-radius:7px;border:1px solid var(--bdl);font-weight:500}
+
+/* ── Modals ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:1000;display:none;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+@media(min-width:600px){.overlay{align-items:center}}
+.modal{background:var(--white);border-radius:22px 22px 0 0;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;padding:20px 18px;position:relative}
+@media(min-width:600px){.modal{border-radius:22px;margin:12px}}
+.modal-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.modal-title{font-size:1rem;font-weight:800;letter-spacing:-.3px}
+.modal-date{font-size:.7rem;color:var(--t3);margin-top:3px}
+.close-btn{width:28px;height:28px;background:#EAEFEC;border:none;border-radius:50%;cursor:pointer;font-size:.82rem;color:var(--t2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s}
+.close-btn:hover{background:var(--gl)}
+
+/* Meal tabs */
+.meal-tabs{display:flex;gap:4px;margin-bottom:14px;background:var(--bg);border-radius:12px;padding:4px}
+.meal-tab{flex:1;padding:7px 4px;border:none;border-radius:8px;cursor:pointer;font-size:.72rem;font-weight:700;font-family:inherit;transition:all .18s;background:transparent;color:var(--t3)}
+.meal-tab.active{background:var(--white);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.meal-tab.has-data{color:var(--g)}
+.meal-tab.active.has-data{color:var(--g)}
+.meal-panel{display:none}
+.meal-panel.active{display:block}
+
+.sec-label{font-size:.7rem;font-weight:800;color:var(--g);margin:13px 0 7px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:5px}
+
+/* Grain multi-select */
+.grain-grid{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.grain-btn{padding:5px 11px;border:1.5px solid var(--bd);background:var(--white);border-radius:8px;cursor:pointer;font-size:.76rem;font-weight:500;font-family:inherit;transition:all .15s;color:var(--t2)}
+.grain-btn:hover{border-color:var(--g)}
+.grain-btn.sel{border-color:var(--g);background:var(--gl);color:var(--g);font-weight:700}
+.custom-grain-row{display:flex;gap:6px;margin-top:5px;align-items:center}
+.custom-grain-inp{flex:1;padding:6px 10px;border:1.5px solid var(--bd);border-radius:8px;font-size:.8rem;font-family:inherit;color:var(--text)}
+.custom-grain-inp:focus{outline:none;border-color:var(--g)}
+
+.toggle-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.t-btn{padding:7px 13px;border:1.5px solid var(--bd);background:var(--white);border-radius:10px;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .18s;display:inline-flex;align-items:center;gap:5px;font-family:inherit;color:var(--t2)}
+.t-btn:hover{border-color:var(--g)}
+.t-btn.on{border-color:var(--g);background:var(--gl);color:var(--g)}
+
+/* Fruit/allergy grid */
+.opt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:5px}
+.opt{border:1.5px solid var(--bd);background:var(--white);border-radius:10px;padding:6px 3px;cursor:pointer;text-align:center;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px}
+.opt:hover{border-color:var(--g);background:var(--gp)}
+.opt.sel{border-color:var(--g);background:var(--gl)}
+.opt .el{font-size:.58rem;color:var(--t2);line-height:1.2;word-break:keep-all}
+.opt-dot{width:14px;height:14px;border-radius:50%;background:var(--g);display:inline-block;flex-shrink:0}
+.opt-add{border-style:dashed}
+.opt-add .el{color:var(--g);font-weight:700}
+
+.inp-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:7px}
+.g-inp{width:76px;padding:7px 9px;border:1.5px solid var(--bd);border-radius:8px;font-size:.82rem;font-family:inherit;color:var(--text)}
+.g-inp:focus{outline:none;border-color:var(--g)}
+.g-lbl{font-size:.76rem;color:var(--t3)}
+select.s-sel{padding:7px 9px;border:1.5px solid var(--bd);border-radius:8px;font-size:.78rem;background:var(--white);font-family:inherit;color:var(--text);cursor:pointer}
+select.s-sel:focus{outline:none;border-color:var(--g)}
+textarea.memo-ta{width:100%;padding:9px 11px;border:1.5px solid var(--bd);border-radius:10px;font-size:.78rem;resize:vertical;min-height:58px;font-family:inherit;color:var(--text);margin-top:6px;line-height:1.6}
+textarea.memo-ta:focus{outline:none;border-color:var(--g)}
+
+/* Fruit gram row */
+.fruit-gram-row{display:none;margin-top:7px;padding:8px 11px;background:var(--gp);border-radius:9px;align-items:center;gap:8px;flex-wrap:wrap}
+.fruit-gram-row.show{display:flex}
+
+/* Custom fruit add */
+.custom-opt-row{display:none;margin-top:6px;gap:5px;align-items:center}
+.custom-opt-row.show{display:flex}
+.custom-opt-inp{flex:1;padding:7px 10px;border:1.5px solid var(--g);border-radius:8px;font-size:.8rem;font-family:inherit;color:var(--text)}
+.custom-opt-inp:focus{outline:none}
+.btn-add-sm{padding:7px 12px;background:var(--g);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.75rem;font-weight:700;font-family:inherit;white-space:nowrap}
+
+.modal-ftr{display:flex;gap:7px;margin-top:16px;padding-top:14px;border-top:1px solid var(--bdl)}
+.modal-ftr .btn{flex:1;padding:12px;font-size:.85rem}
+
+/* Day memo */
+.day-memo-wrap{margin-top:14px;padding-top:12px;border-top:1.5px dashed var(--bdl)}
+.day-memo-label{font-size:.7rem;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+
+/* ── Password Modal ── */
+.pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.46);z-index:2000;display:none;align-items:center;justify-content:center;padding:16px}
+.pw-overlay.open{display:flex}
+.pw-box{background:var(--white);border-radius:22px;width:100%;max-width:330px;padding:30px 24px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.pw-emoji{font-size:2.2rem;margin-bottom:10px}
+.pw-title{font-size:1rem;font-weight:800;margin-bottom:5px}
+.pw-sub{font-size:.75rem;color:var(--t3);margin-bottom:18px;line-height:1.5}
+.pw-inp{width:100%;padding:12px;border:2px solid var(--bd);border-radius:12px;font-size:1rem;text-align:center;letter-spacing:5px;font-family:inherit;margin-bottom:10px;transition:border-color .18s}
+.pw-inp:focus{outline:none;border-color:var(--g)}
+.pw-err{color:var(--red);font-size:.72rem;min-height:18px;margin-bottom:8px}
+
+/* ── Settings ── */
+.settings-form label{font-size:.76rem;color:var(--t3);display:block;margin-bottom:4px;margin-top:12px;font-weight:600}
+.settings-form input{width:100%;padding:9px 11px;border:1.5px solid var(--bd);border-radius:8px;font-size:.82rem;font-family:inherit;color:var(--text)}
+.settings-form input:focus{outline:none;border-color:var(--g)}
+.settings-note{font-size:.68rem;color:var(--t3);margin-top:4px;line-height:1.5}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(90px);background:rgba(28,46,34,.9);color:#fff;padding:10px 20px;border-radius:22px;font-size:.78rem;font-weight:600;transition:transform .28s cubic-bezier(.34,1.56,.64,1);z-index:9999;white-space:nowrap;backdrop-filter:blur(8px)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── Paste highlight ── */
+.paste-ready{outline:2.5px dashed var(--g)!important;background:var(--gp)!important}
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="app-header">
+  <div class="app-title">🍼 유하의 이유식 플랜</div>
+  <div class="header-right">
+    <span class="edit-badge" id="editBadge" style="display:none">✏ 수정 모드</span>
+    <button class="btn btn-gray" id="logoutBtn" style="display:none" onclick="logout()">잠금</button>
+    <button class="btn btn-ghost" id="editBtn" onclick="showPwModal()">🔓 수정</button>
+    <button class="btn btn-primary" onclick="saveToGithub()">💾 저장</button>
+    <button class="btn btn-print icon-btn" onclick="printCal()" title="달력 인쇄">🖨</button>
+    <button class="icon-btn" onclick="showSettings()" title="설정">⚙️</button>
+  </div>
+</div>
+
+<!-- ── Main Layout ── -->
+<div class="main-layout">
+
+  <!-- Calendar -->
+  <div class="cal-card">
+    <div class="cal-nav">
+      <button class="nav-arrow" onclick="shiftWeeks(-1)">‹</button>
+      <div class="cal-nav-info">
+        <div class="cal-nav-title" id="calRangeTitle"></div>
+        <div class="cal-nav-sub" id="calRangeSub"></div>
+      </div>
+      <button class="nav-arrow" onclick="shiftWeeks(1)">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="notice-col">
+
+    <!-- Weather (compact) -->
+    <div class="n-card">
+      <div class="n-title">🌤 날씨</div>
+      <div class="w-date" id="todayDate"></div>
+      <div class="weather-compact">
+        <div class="w-icon" id="wIcon">⏳</div>
+        <div>
+          <div class="w-temp" id="wTemp">--</div>
+          <div class="w-desc" id="wDesc">불러오는 중...</div>
+        </div>
+      </div>
+      <div class="dust-row" id="dustRow"><span class="d-badge d-moderate">미세먼지 --</span></div>
+    </div>
+
+    <!-- D+ (compact) -->
+    <div class="n-card">
+      <div class="n-title">🎂 성장</div>
+      <div class="dday-compact">
+        <div>
+          <div class="dday-num" id="ddayNum">D+---</div>
+          <div class="dday-lbl" id="ddayLbl">탄생일로부터</div>
+        </div>
+        <div class="dday-detail" id="ageLine"></div>
+      </div>
+    </div>
+
+    <!-- Notepad -->
+    <div class="n-card">
+      <div class="n-title">📋 메모장</div>
+      <textarea class="notepad-ta" id="notepadTa" placeholder="자유롭게 메모하세요..." rows="5" oninput="notepadChanged()"></textarea>
+      <button class="btn btn-primary notepad-save" onclick="saveNotepad()">저장</button>
+    </div>
+
+    <!-- Tips -->
+    <div class="n-card">
+      <div class="n-title">💡 이달의 팁</div>
+      <ul class="tip-items" id="tipItems"></ul>
+    </div>
+
+    <!-- Foods -->
+    <div class="n-card">
+      <div class="n-title">🥄 먹어본 음식</div>
+      <div class="food-total" id="foodTotal">총 0가지</div>
+      <div class="food-chips" id="foodChips"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Cell Modal ── -->
+<div class="overlay" id="cellOverlay" onclick="if(event.target===this)closeCellModal()">
+  <div class="modal" id="cellModal">
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-title" id="cellModalTitle">이유식 기록</div>
+        <div class="modal-date" id="cellModalDate"></div>
+      </div>
+      <button class="close-btn" onclick="closeCellModal()">✕</button>
+    </div>
+
+    <!-- Meal tabs -->
+    <div class="meal-tabs">
+      <button class="meal-tab active" data-meal="morning" onclick="switchMeal('morning')">아침</button>
+      <button class="meal-tab" data-meal="lunch" onclick="switchMeal('lunch')">점심</button>
+      <button class="meal-tab" data-meal="dinner" onclick="switchMeal('dinner')">저녁</button>
+      <button class="meal-tab" data-meal="snack" onclick="switchMeal('snack')">간식</button>
+    </div>
+
+    <!-- Morning panel -->
+    <div class="meal-panel active" id="panel-morning" data-meal="morning">
+      <!-- 미음 -->
+      <div class="sec-label">🍚 미음</div>
+      <div class="toggle-row">
+        <button class="t-btn" id="porridgeToggle-morning" onclick="togglePorridge('morning')">+ 미음 추가</button>
+      </div>
+      <div id="porridgeDetail-morning" style="display:none">
+        <div class="grain-grid" id="grainGrid-morning">
+          <button class="grain-btn" data-grain="흰쌀" onclick="toggleGrain(this,'morning')">흰쌀</button>
+          <button class="grain-btn" data-grain="잡곡" onclick="toggleGrain(this,'morning')">잡곡</button>
+          <button class="grain-btn" data-grain="현미" onclick="toggleGrain(this,'morning')">현미</button>
+          <button class="grain-btn" data-grain="오트밀" onclick="toggleGrain(this,'morning')">오트밀</button>
+        </div>
+        <div class="custom-grain-row">
+          <input type="text" class="custom-grain-inp" id="customGrain-morning" placeholder="직접 입력 (예: 보리)">
+          <button class="btn-add-sm" onclick="addCustomGrain('morning')">추가</button>
+        </div>
+        <div class="inp-row">
+          <select class="s-sel" id="porridgeRatio-morning">
+            <option value="10">10배죽</option><option value="9">9배죽</option>
+            <option value="8">8배죽</option><option value="7">7배죽</option>
+            <option value="6">6배죽</option><option value="5">5배죽</option>
+            <option value="4">4배죽</option><option value="3">3배죽</option>
+            <option value="2">2배죽</option><option value="1">1배죽</option>
+          </select>
+          <input type="number" class="g-inp" id="porridgeGrams-morning" placeholder="g수">
+          <span class="g-lbl">g</span>
+        </div>
+      </div>
+      <!-- 고기 -->
+      <div class="sec-label">🥩 고기</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap" id="meatGrid-morning">
+        <button class="grain-btn" data-meat="소고기" onclick="toggleMeatBtn(this,'morning')">소고기</button>
+        <button class="grain-btn" data-meat="닭고기" onclick="toggleMeatBtn(this,'morning')">닭고기</button>
+        <button class="grain-btn" data-meat="돼지고기" onclick="toggleMeatBtn(this,'morning')">돼지고기</button>
+      </div>
+      <div class="inp-row" id="meatGramRow-morning" style="display:none">
+        <input type="number" class="g-inp" id="meatGrams-morning" placeholder="g수">
+        <span class="g-lbl">g</span>
+      </div>
+      <!-- 과일 -->
+      <div class="sec-label">🍎 과일</div>
+      <div class="opt-grid" id="fruitGrid-morning"></div>
+      <div class="custom-opt-row" id="customFruitRow-morning">
+        <input type="text" class="custom-opt-inp" id="customFruitInp-morning" placeholder="과일 이름" maxlength="12">
+        <button class="btn-add-sm" onclick="confirmCustomFruit('morning')">추가</button>
+        <button class="btn btn-cancel" onclick="hideCustomFruit('morning')" style="padding:6px 10px;font-size:.72rem">취소</button>
+      </div>
+      <div class="fruit-gram-row" id="fruitGramRow-morning">
+        <span style="font-size:.74rem;color:var(--t2);font-weight:600">과일 총량</span>
+        <input type="number" class="g-inp" id="fruitGrams-morning" placeholder="g수">
+        <span class="g-lbl">g</span>
+      </div>
+      <!-- 알레르기 -->
+      <div class="sec-label">⚠️ 알레르기 테스트</div>
+      <div class="opt-grid" id="allergyGrid-morning"></div>
+      <!-- 이 끼니 메모 -->
+      <div class="sec-label">📝 끼니 메모</div>
+      <textarea class="memo-ta" id="mealMemo-morning" placeholder="이 끼니의 메모..." rows="2"></textarea>
+    </div>
+
+    <!-- Lunch panel -->
+    <div class="meal-panel" id="panel-lunch" data-meal="lunch">
+      <div class="sec-label">🍚 미음</div>
+      <div class="toggle-row">
+        <button class="t-btn" id="porridgeToggle-lunch" onclick="togglePorridge('lunch')">+ 미음 추가</button>
+      </div>
+      <div id="porridgeDetail-lunch" style="display:none">
+        <div class="grain-grid" id="grainGrid-lunch">
+          <button class="grain-btn" data-grain="흰쌀" onclick="toggleGrain(this,'lunch')">흰쌀</button>
+          <button class="grain-btn" data-grain="잡곡" onclick="toggleGrain(this,'lunch')">잡곡</button>
+          <button class="grain-btn" data-grain="현미" onclick="toggleGrain(this,'lunch')">현미</button>
+          <button class="grain-btn" data-grain="오트밀" onclick="toggleGrain(this,'lunch')">오트밀</button>
+        </div>
+        <div class="custom-grain-row">
+          <input type="text" class="custom-grain-inp" id="customGrain-lunch" placeholder="직접 입력 (예: 보리)">
+          <button class="btn-add-sm" onclick="addCustomGrain('lunch')">추가</button>
+        </div>
+        <div class="inp-row">
+          <select class="s-sel" id="porridgeRatio-lunch">
+            <option value="10">10배죽</option><option value="9">9배죽</option>
+            <option value="8">8배죽</option><option value="7">7배죽</option>
+            <option value="6">6배죽</option><option value="5">5배죽</option>
+            <option value="4">4배죽</option><option value="3">3배죽</option>
+            <option value="2">2배죽</option><option value="1">1배죽</option>
+          </select>
+          <input type="number" class="g-inp" id="porridgeGrams-lunch" placeholder="g수">
+          <span class="g-lbl">g</span>
+        </div>
+      </div>
+      <div class="sec-label">🥩 고기</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap" id="meatGrid-lunch">
+        <button class="grain-btn" data-meat="소고기" onclick="toggleMeatBtn(this,'lunch')">소고기</button>
+        <button class="grain-btn" data-meat="닭고기" onclick="toggleMeatBtn(this,'lunch')">닭고기</button>
+        <button class="grain-btn" data-meat="돼지고기" onclick="toggleMeatBtn(this,'lunch')">돼지고기</button>
+      </div>
+      <div class="inp-row" id="meatGramRow-lunch" style="display:none">
+        <input type="number" class="g-inp" id="meatGrams-lunch" placeholder="g수">
+        <span class="g-lbl">g</span>
+      </div>
+      <div class="sec-label">🍎 과일</div>
+      <div class="opt-grid" id="fruitGrid-lunch"></div>
+      <div class="custom-opt-row" id="customFruitRow-lunch">
+        <input type="text" class="custom-opt-inp" id="customFruitInp-lunch" placeholder="과일 이름" maxlength="12">
+        <button class="btn-add-sm" onclick="confirmCustomFruit('lunch')">추가</button>
+        <button class="btn btn-cancel" onclick="hideCustomFruit('lunch')" style="padding:6px 10px;font-size:.72rem">취소</button>
+      </div>
+      <div class="fruit-gram-row" id="fruitGramRow-lunch">
+        <span style="font-size:.74rem;color:var(--t2);font-weight:600">과일 총량</span>
+        <input type="number" class="g-inp" id="fruitGrams-lunch" placeholder="g수">
+        <span class="g-lbl">g</span>
+      </div>
+      <div class="sec-label">⚠️ 알레르기 테스트</div>
+      <div class="opt-grid" id="allergyGrid-lunch"></div>
+      <div class="sec-label">📝 끼니 메모</div>
+      <textarea class="memo-ta" id="mealMemo-lunch" placeholder="이 끼니의 메모..." rows="2"></textarea>
+    </div>
+
+    <!-- Dinner panel -->
+    <div class="meal-panel" id="panel-dinner" data-meal="dinner">
+      <div class="sec-label">🍚 미음</div>
+      <div class="toggle-row">
+        <button class="t-btn" id="porridgeToggle-dinner" onclick="togglePorridge('dinner')">+ 미음 추가</button>
+      </div>
+      <div id="porridgeDetail-dinner" style="display:none">
+        <div class="grain-grid" id="grainGrid-dinner">
+          <button class="grain-btn" data-grain="흰쌀" onclick="toggleGrain(this,'dinner')">흰쌀</button>
+          <button class="grain-btn" data-grain="잡곡" onclick="toggleGrain(this,'dinner')">잡곡</button>
+          <button class="grain-btn" data-grain="현미" onclick="toggleGrain(this,'dinner')">현미</button>
+          <button class="grain-btn" data-grain="오트밀" onclick="toggleGrain(this,'dinner')">오트밀</button>
+        </div>
+        <div class="custom-grain-row">
+          <input type="text" class="custom-grain-inp" id="customGrain-dinner" placeholder="직접 입력 (예: 보리)">
+          <button class="btn-add-sm" onclick="addCustomGrain('dinner')">추가</button>
+        </div>
+        <div class="inp-row">
+          <select class="s-sel" id="porridgeRatio-dinner">
+            <option value="10">10배죽</option><option value="9">9배죽</option>
+            <option value="8">8배죽</option><option value="7">7배죽</option>
+            <option value="6">6배죽</option><option value="5">5배죽</option>
+            <option value="4">4배죽</option><option value="3">3배죽</option>
+            <option value="2">2배죽</option><option value="1">1배죽</option>
+          </select>
+          <input type="number" class="g-inp" id="porridgeGrams-dinner" placeholder="g수">
+          <span class="g-lbl">g</span>
+        </div>
+      </div>
+      <div class="sec-label">🥩 고기</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap" id="meatGrid-dinner">
+        <button class="grain-btn" data-meat="소고기" onclick="toggleMeatBtn(this,'dinner')">소고기</button>
+        <button class="grain-btn" data-meat="닭고기" onclick="toggleMeatBtn(this,'dinner')">닭고기</button>
+        <button class="grain-btn" data-meat="돼지고기" onclick="toggleMeatBtn(this,'dinner')">돼지고기</button>
+      </div>
+      <div class="inp-row" id="meatGramRow-dinner" style="display:none">
+        <input type="number" class="g-inp" id="meatGrams-dinner" placeholder="g수">
+        <span class="g-lbl">g</span>
+      </div>
+      <div class="sec-label">🍎 과일</div>
+      <div class="opt-grid" id="fruitGrid-dinner"></div>
+      <div class="custom-opt-row" id="customFruitRow-dinner">
+        <input type="text" class="custom-opt-inp" id="customFruitInp-dinner" placeholder="과일 이름" maxlength="12">
+        <button class="btn-add-sm" onclick="confirmCustomFruit('dinner')">추가</button>
+        <button class="btn btn-cancel" onclick="hideCustomFruit('dinner')" style="padding:6px 10px;font-size:.72rem">취소</button>
+      </div>
+      <div class="fruit-gram-row" id="fruitGramRow-dinner">
+        <span style="font-size:.74rem;color:var(--t2);font-weight:600">과일 총량</span>
+        <input type="number" class="g-inp" id="fruitGrams-dinner" placeholder="g수">
+        <span class="g-lbl">g</span>
+      </div>
+      <div class="sec-label">⚠️ 알레르기 테스트</div>
+      <div class="opt-grid" id="allergyGrid-dinner"></div>
+      <div class="sec-label">📝 끼니 메모</div>
+      <textarea class="memo-ta" id="mealMemo-dinner" placeholder="이 끼니의 메모..." rows="2"></textarea>
+    </div>
+
+    <!-- Snack panel -->
+    <div class="meal-panel" id="panel-snack" data-meal="snack">
+      <div class="sec-label">🍚 미음</div>
+      <div class="toggle-row">
+        <button class="t-btn" id="porridgeToggle-snack" onclick="togglePorridge('snack')">+ 미음 추가</button>
+      </div>
+      <div id="porridgeDetail-snack" style="display:none">
+        <div class="grain-grid" id="grainGrid-snack">
+          <button class="grain-btn" data-grain="흰쌀" onclick="toggleGrain(this,'snack')">흰쌀</button>
+          <button class="grain-btn" data-grain="잡곡" onclick="toggleGrain(this,'snack')">잡곡</button>
+          <button class="grain-btn" data-grain="현미" onclick="toggleGrain(this,'snack')">현미</button>
+          <button class="grain-btn" data-grain="오트밀" onclick="toggleGrain(this,'snack')">오트밀</button>
+        </div>
+        <div class="custom-grain-row">
+          <input type="text" class="custom-grain-inp" id="customGrain-snack" placeholder="직접 입력 (예: 보리)">
+          <button class="btn-add-sm" onclick="addCustomGrain('snack')">추가</button>
+        </div>
+        <div class="inp-row">
+          <select class="s-sel" id="porridgeRatio-snack">
+            <option value="10">10배죽</option><option value="9">9배죽</option>
+            <option value="8">8배죽</option><option value="7">7배죽</option>
+            <option value="6">6배죽</option><option value="5">5배죽</option>
+            <option value="4">4배죽</option><option value="3">3배죽</option>
+            <option value="2">2배죽</option><option value="1">1배죽</option>
+          </select>
+          <input type="number" class="g-inp" id="porridgeGrams-snack" placeholder="g수">
+          <span class="g-lbl">g</span>
+        </div>
+      </div>
+      <div class="sec-label">🥩 고기</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap" id="meatGrid-snack">
+        <button class="grain-btn" data-meat="소고기" onclick="toggleMeatBtn(this,'snack')">소고기</button>
+        <button class="grain-btn" data-meat="닭고기" onclick="toggleMeatBtn(this,'snack')">닭고기</button>
+        <button class="grain-btn" data-meat="돼지고기" onclick="toggleMeatBtn(this,'snack')">돼지고기</button>
+      </div>
+      <div class="inp-row" id="meatGramRow-snack" style="display:none">
+        <input type="number" class="g-inp" id="meatGrams-snack" placeholder="g수">
+        <span class="g-lbl">g</span>
+      </div>
+      <div class="sec-label">🍎 과일</div>
+      <div class="opt-grid" id="fruitGrid-snack"></div>
+      <div class="custom-opt-row" id="customFruitRow-snack">
+        <input type="text" class="custom-opt-inp" id="customFruitInp-snack" placeholder="과일 이름" maxlength="12">
+        <button class="btn-add-sm" onclick="confirmCustomFruit('snack')">추가</button>
+        <button class="btn btn-cancel" onclick="hideCustomFruit('snack')" style="padding:6px 10px;font-size:.72rem">취소</button>
+      </div>
+      <div class="fruit-gram-row" id="fruitGramRow-snack">
+        <span style="font-size:.74rem;color:var(--t2);font-weight:600">과일 총량</span>
+        <input type="number" class="g-inp" id="fruitGrams-snack" placeholder="g수">
+        <span class="g-lbl">g</span>
+      </div>
+      <div class="sec-label">⚠️ 알레르기 테스트</div>
+      <div class="opt-grid" id="allergyGrid-snack"></div>
+      <div class="sec-label">📝 끼니 메모</div>
+      <textarea class="memo-ta" id="mealMemo-snack" placeholder="이 끼니의 메모..." rows="2"></textarea>
+    </div>
+
+    <!-- Day-level memo -->
+    <div class="day-memo-wrap">
+      <div class="day-memo-label">하루 전체 메모</div>
+      <textarea class="memo-ta" id="cellMemo" placeholder="하루 전체 메모..." rows="2"></textarea>
+    </div>
+
+    <div class="modal-ftr">
+      <button class="btn btn-danger" onclick="clearCell()">🗑 지우기</button>
+      <button class="btn btn-cancel" id="pasteBtn" onclick="pasteCell()" style="display:none">📋 붙여넣기</button>
+      <button class="btn btn-ghost" onclick="copyCell()">복사</button>
+      <button class="btn btn-cancel" onclick="closeCellModal()">취소</button>
+      <button class="btn btn-primary" onclick="saveCell()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Password Modal ── -->
+<div class="pw-overlay" id="pwOverlay">
+  <div class="pw-box">
+    <div class="pw-emoji">🌿</div>
+    <div class="pw-title">수정 모드 잠금 해제</div>
+    <div class="pw-sub">비밀번호를 입력하면<br>이유식 플랜을 수정할 수 있어요</div>
+    <input type="password" class="pw-inp" id="pwInput" placeholder="••••••" onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="pw-err" id="pwErr"></div>
+    <button class="btn btn-primary" style="width:100%;padding:12px" onclick="checkPw()">확인</button>
+    <br><br>
+    <button class="btn btn-cancel" style="width:100%;margin-top:4px;padding:10px" onclick="closePwModal()">취소</button>
+  </div>
+</div>
+
+<!-- ── Settings Modal ── -->
+<div class="overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-hdr">
+      <div class="modal-title">⚙️ 설정</div>
+      <button class="close-btn" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-form">
+      <label>👶 탄생일</label>
+      <input type="date" id="setBirthDate">
+      <label>🥣 이유식 시작일</label>
+      <input type="date" id="setIyusikStart">
+      <div class="settings-note">달력 날짜 옆 D+일수 계산에 사용됩니다.</div>
+      <label>📍 날씨 도시 (영어)</label>
+      <input type="text" id="setCity" placeholder="Seoul">
+      <div class="sec-label" style="margin-top:18px">💾 GitHub 저장 설정</div>
+      <label>Personal Access Token</label>
+      <input type="password" id="setGhToken" placeholder="ghp_xxxxxxxxxxxx">
+      <div class="settings-note">repo 권한 필요 · GitHub → Settings → Developer settings → Personal access tokens</div>
+      <label>저장소 (owner/repo)</label>
+      <input type="text" id="setGhRepo" placeholder="username/yuha-plan">
+      <label>저장 파일 경로</label>
+      <input type="text" id="setGhPath" placeholder="yuha-iyusik.json">
+    </div>
+    <div class="modal-ftr">
+      <button class="btn btn-cancel" onclick="closeSettings()">취소</button>
+      <button class="btn btn-primary" onclick="saveSettings()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ CONSTANTS ═══
+const PASSWORD = 'y0310402';
+const AUTH_KEY = 'yuha_auth';
+const DATA_KEY = 'yuha_data';
+const SETTINGS_KEY = 'yuha_settings';
+const MEAL_KEYS = ['morning','lunch','dinner','snack'];
+const MEAL_LABELS = {morning:'아침',lunch:'점심',dinner:'저녁',snack:'간식'};
+
+const FRUITS = [
+  {name:'사과'},{name:'배'},{name:'바나나'},{name:'복숭아'},
+  {name:'딸기'},{name:'블루베리'},{name:'수박'},{name:'포도'},
+  {name:'키위'},{name:'참외'},{name:'망고'},{name:'아보카도'},
+  {name:'자두'},{name:'감'}
+];
+const ALLERGIES = [
+  {name:'달걀'},{name:'밀(글루텐)'},{name:'우유'},{name:'두유·콩'},
+  {name:'땅콩'},{name:'새우'},{name:'게'},{name:'참깨'},
+  {name:'호두'},{name:'토마토'},{name:'오징어'},{name:'고등어'}
+];
+const KR_HOLIDAYS = {
+  '2025-01-01':'신정','2025-01-29':'설날','2025-03-01':'삼일절',
+  '2025-05-05':'어린이날','2025-05-13':'부처님오신날','2025-06-06':'현충일',
+  '2025-08-15':'광복절','2025-10-03':'개천절','2025-10-07':'추석',
+  '2025-10-09':'한글날','2025-12-25':'성탄절',
+  '2026-01-01':'신정','2026-02-18':'설날','2026-03-01':'삼일절',
+  '2026-05-05':'어린이날','2026-05-24':'부처님오신날','2026-06-06':'현충일',
+  '2026-08-15':'광복절','2026-09-25':'추석','2026-10-03':'개천절',
+  '2026-10-09':'한글날','2026-12-25':'성탄절'
+};
+const DAY_NAMES = ['일','월','화','수','목','금','토'];
+
+// ═══ STATE ═══
+let isEditMode = false;
+let calOffset = 0;
+let currentEditDate = null;
+let activeMeal = 'morning';
+let clipboard = null;
+let notepadDirty = false;
+let appData = { entries:{}, notepad:'', customFruits:[] };
+let settings = { birthDate:'2025-10-03', iyusikStartDate:'', city:'Seoul', github:{token:'',repo:'',path:'yuha-iyusik.json'} };
+
+// ═══ STORAGE ═══
+function loadAll(){
+  try{ const d=localStorage.getItem(DATA_KEY); if(d){ const p=JSON.parse(d); appData={entries:{},notepad:'',customFruits:[],...p}; } }catch(e){}
+  try{ const s=localStorage.getItem(SETTINGS_KEY); if(s) settings={...settings,...JSON.parse(s)}; }catch(e){}
+  try{ const a=JSON.parse(localStorage.getItem(AUTH_KEY)||'{}'); if(a.exp&&Date.now()<a.exp) isEditMode=true; }catch(e){}
+}
+function saveLocal(){ localStorage.setItem(DATA_KEY,JSON.stringify(appData)); }
+
+// ═══ DATE HELPERS ═══
+function dateStr(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function parseDate(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function addDays(date,n){ const d=new Date(date); d.setDate(d.getDate()+n); return d; }
+function getWeekSun(date){ const d=new Date(date); d.setHours(0,0,0,0); d.setDate(d.getDate()-d.getDay()); return d; }
+function diffDays(a,b){ return Math.floor((a-b)/(1000*60*60*24)); }
+
+// ═══ CALENDAR ═══
+function renderCalendar(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const startSun=addDays(getWeekSun(addDays(getWeekSun(today),-7)),calOffset*7);
+  const endSat=addDays(startSun,27);
+  const sm=startSun.getMonth()+1, sy=startSun.getFullYear();
+  const em=endSat.getMonth()+1, ey=endSat.getFullYear();
+  document.getElementById('calRangeTitle').textContent=
+    sy===ey&&sm===em?`${sy}년 ${sm}월`:`${sy}년 ${sm}월 ~ ${ey}년 ${em}월`;
+  document.getElementById('calRangeSub').textContent='4주 보기';
+
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  DAY_NAMES.forEach((n,i)=>{
+    const h=document.createElement('div');
+    h.className='day-header'+(i===0?' sun':i===6?' sat':'');
+    h.textContent=n; grid.appendChild(h);
+  });
+
+  const birth=settings.birthDate?parseDate(settings.birthDate):null;
+  const iyuStart=settings.iyusikStartDate?parseDate(settings.iyusikStartDate):null;
+
+  for(let i=0;i<28;i++){
+    const d=addDays(startSun,i);
+    const ds=dateStr(d);
+    const dow=d.getDay();
+    const isToday=ds===dateStr(today);
+    const isHol=!!KR_HOLIDAYS[ds];
+    const cell=document.createElement('div');
+    cell.className='cal-cell'+(isToday?' today':'')+(dow===0?' is-sun':dow===6?' is-sat':'')+(isHol?' is-hol':'')+(!isEditMode?' view-only':'');
+    cell.dataset.date=ds;
+
+    // Copy button
+    if(isEditMode){
+      const cb=document.createElement('button');
+      cb.className='cell-copy-btn'; cb.title='복사';
+      cb.innerHTML='⎘';
+      cb.onclick=(e)=>{e.stopPropagation();copyCellDate(ds);};
+      cell.appendChild(cb);
+      cell.onclick=()=>openCellModal(ds);
+    }
+
+    // Date + D+
+    const topDiv=document.createElement('div');
+    topDiv.className='cell-top';
+    const dateSpan=document.createElement('span');
+    dateSpan.className='cell-date';
+    dateSpan.textContent=d.getDate()===1?`${d.getMonth()+1}/1`:d.getDate();
+    topDiv.appendChild(dateSpan);
+
+    if(birth||iyuStart){
+      const ddSpan=document.createElement('span');
+      ddSpan.className='cell-ddays';
+      const lines=[];
+      if(birth){ const n=diffDays(d,birth); if(n>=0) lines.push(`D+${n}`); }
+      if(iyuStart){ const n=diffDays(d,iyuStart); if(n>=0) lines.push(`이유D+${n}`); }
+      ddSpan.textContent=lines.join('\n');
+      topDiv.appendChild(ddSpan);
+    }
+    cell.appendChild(topDiv);
+
+    if(isHol){
+      const hn=document.createElement('span');
+      hn.className='hol-name'; hn.textContent=KR_HOLIDAYS[ds];
+      cell.appendChild(hn);
+    }
+
+    // Meals display
+    const entry=appData.entries[ds];
+    if(entry&&entry.meals){
+      const mealsDiv=document.createElement('div');
+      mealsDiv.className='cell-meals';
+      MEAL_KEYS.forEach(mk=>{
+        const meal=entry.meals[mk];
+        if(!meal) return;
+        const items=getMealSummaryItems(meal);
+        if(!items.length&&!meal.memo) return;
+        const row=document.createElement('div');
+        row.className='cell-meal-row';
+        const tag=document.createElement('span');
+        tag.className='cell-meal-tag'+(mk==='morning'?'':' '+mk);
+        tag.textContent=MEAL_LABELS[mk][0];
+        row.appendChild(tag);
+        const itemsSpan=document.createElement('span');
+        itemsSpan.className='cell-meal-items';
+        items.forEach(txt=>{
+          const line=document.createElement('div');
+          line.className='cell-item-line';
+          line.textContent=txt;
+          itemsSpan.appendChild(line);
+        });
+        row.appendChild(itemsSpan);
+        mealsDiv.appendChild(row);
+      });
+      // Legacy entry support
+      if(entry.porridge||entry.meat?.length||entry.fruits?.length){
+        const row=document.createElement('div');
+        row.className='cell-meal-row';
+        const tag=document.createElement('span'); tag.className='cell-meal-tag'; tag.textContent='아';
+        row.appendChild(tag);
+        const sp=document.createElement('span'); sp.className='cell-meal-items';
+        if(entry.porridge){const l=document.createElement('div');l.className='cell-item-line';l.textContent=`미음 ${entry.porridge.ratio}배`;sp.appendChild(l);}
+        (entry.meat||[]).forEach(m=>{const l=document.createElement('div');l.className='cell-item-line';l.textContent=m.type+(m.grams?` ${m.grams}g`:'');sp.appendChild(l);});
+        (entry.fruits||[]).forEach(f=>{const l=document.createElement('div');l.className='cell-item-line';l.textContent=f.name;sp.appendChild(l);});
+        row.appendChild(sp); mealsDiv.appendChild(row);
+      }
+      if(mealsDiv.childNodes.length) cell.appendChild(mealsDiv);
+      if(entry.memo){
+        const m=document.createElement('div'); m.className='cell-memo-preview'; m.textContent=entry.memo; cell.appendChild(m);
+      }
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function getMealSummaryItems(meal){
+  const items=[];
+  if(meal.porridge){
+    const grains=(meal.porridge.grains||[]).join('+') || meal.porridge.grain || '';
+    items.push(`미음 ${meal.porridge.ratio}배${grains?' '+grains:''}${meal.porridge.grams?' '+meal.porridge.grams+'g':''}`);
+  }
+  (meal.meat||[]).forEach(m=>items.push(m.type+(m.grams?` ${m.grams}g`:'')));
+  (meal.fruits||[]).forEach(f=>items.push(f.name+(meal.fruitGrams?` ${meal.fruitGrams}g`:'')));
+  (meal.allergy||[]).forEach(a=>items.push(`⚠${a.name}`));
+  return items;
+}
+
+function shiftWeeks(n){ calOffset+=n; renderCalendar(); }
+
+// ═══ MODAL ═══
+let _currentMealBeforeOpen = 'morning';
+function switchMeal(mk){
+  activeMeal=mk;
+  document.querySelectorAll('.meal-tab').forEach(t=>t.classList.toggle('active',t.dataset.meal===mk));
+  document.querySelectorAll('.meal-panel').forEach(p=>p.classList.toggle('active',p.dataset.meal===mk));
+}
+
+function buildFruitGrid(mk){
+  const fg=document.getElementById('fruitGrid-'+mk);
+  fg.innerHTML='';
+  const allFruits=[...FRUITS,...(appData.customFruits||[])];
+  allFruits.forEach(f=>{
+    const d=document.createElement('div');
+    d.className='opt'; d.dataset.name=f.name; d.dataset.custom=f.custom||'';
+    if(f.custom){
+      d.innerHTML=`<span class="opt-dot"></span><span class="el">${f.name}</span>`;
+    } else {
+      d.innerHTML=`<span class="el">${f.name}</span>`;
+    }
+    d.onclick=()=>{d.classList.toggle('sel');updateFruitGramRow(mk);};
+    fg.appendChild(d);
+  });
+  // Add custom button
+  const addBtn=document.createElement('div');
+  addBtn.className='opt opt-add';
+  addBtn.innerHTML='<span class="el">+ 추가</span>';
+  addBtn.onclick=()=>showCustomFruit(mk);
+  fg.appendChild(addBtn);
+}
+
+function buildAllergyGrid(mk){
+  const ag=document.getElementById('allergyGrid-'+mk);
+  ag.innerHTML='';
+  ALLERGIES.forEach(a=>{
+    const d=document.createElement('div');
+    d.className='opt'; d.dataset.name=a.name;
+    d.innerHTML=`<span class="el">${a.name}</span>`;
+    d.onclick=()=>d.classList.toggle('sel');
+    ag.appendChild(d);
+  });
+}
+
+function openCellModal(ds){
+  currentEditDate=ds;
+  activeMeal='morning';
+  const d=parseDate(ds);
+  document.getElementById('cellModalTitle').textContent='이유식 기록';
+  document.getElementById('cellModalDate').textContent=
+    `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${DAY_NAMES[d.getDay()]})${KR_HOLIDAYS[ds]?' · '+KR_HOLIDAYS[ds]:''}`;
+
+  MEAL_KEYS.forEach(mk=>{ buildFruitGrid(mk); buildAllergyGrid(mk); });
+  switchMeal('morning');
+
+  const entry=appData.entries[ds]||{};
+  MEAL_KEYS.forEach(mk=>{
+    const meal=(entry.meals&&entry.meals[mk])||{};
+    loadMealIntoForm(mk, meal);
+  });
+
+  document.getElementById('cellMemo').value=entry.memo||'';
+  updateMealTabBadges(entry);
+
+  // Paste button
+  document.getElementById('pasteBtn').style.display=clipboard?'inline-flex':'none';
+
+  document.getElementById('cellOverlay').classList.add('open');
+}
+
+function loadMealIntoForm(mk, meal){
+  // Porridge
+  const pt=document.getElementById('porridgeToggle-'+mk);
+  const pd=document.getElementById('porridgeDetail-'+mk);
+  if(meal.porridge){
+    pt.classList.add('on'); pt.textContent='✓ 미음 추가됨'; pd.style.display='block';
+    // Grains
+    const grains=meal.porridge.grains||[meal.porridge.grain].filter(Boolean);
+    document.querySelectorAll(`#grainGrid-${mk} .grain-btn`).forEach(btn=>{
+      btn.classList.toggle('sel', grains.includes(btn.dataset.grain));
+    });
+    document.getElementById('porridgeRatio-'+mk).value=meal.porridge.ratio||10;
+    document.getElementById('porridgeGrams-'+mk).value=meal.porridge.grams||'';
+  } else {
+    pt.classList.remove('on'); pt.textContent='+ 미음 추가'; pd.style.display='none';
+    document.querySelectorAll(`#grainGrid-${mk} .grain-btn`).forEach(b=>b.classList.remove('sel'));
+    document.getElementById('porridgeGrams-'+mk).value='';
+  }
+  // Meat
+  document.querySelectorAll(`#meatGrid-${mk} .grain-btn`).forEach(btn=>{
+    btn.classList.toggle('sel',(meal.meat||[]).some(m=>m.type===btn.dataset.meat));
+  });
+  const hasMeat=(meal.meat||[]).length>0;
+  document.getElementById('meatGramRow-'+mk).style.display=hasMeat?'flex':'none';
+  document.getElementById('meatGrams-'+mk).value=(meal.meat&&meal.meat[0]&&meal.meat[0].grams)||'';
+  // Fruits
+  (meal.fruits||[]).forEach(f=>{
+    document.querySelectorAll(`#fruitGrid-${mk} .opt`).forEach(el=>{
+      if(el.dataset.name===f.name) el.classList.add('sel');
+    });
+  });
+  updateFruitGramRow(mk);
+  document.getElementById('fruitGrams-'+mk).value=meal.fruitGrams||'';
+  // Allergy
+  (meal.allergy||[]).forEach(a=>{
+    document.querySelectorAll(`#allergyGrid-${mk} .opt`).forEach(el=>{
+      if(el.dataset.name===a.name) el.classList.add('sel');
+    });
+  });
+  document.getElementById('mealMemo-'+mk).value=meal.memo||'';
+}
+
+function updateMealTabBadges(entry){
+  MEAL_KEYS.forEach(mk=>{
+    const meal=(entry.meals&&entry.meals[mk])||{};
+    const hasData=meal.porridge||meal.meat?.length||meal.fruits?.length||meal.allergy?.length||meal.memo;
+    const tab=document.querySelector(`.meal-tab[data-meal="${mk}"]`);
+    if(tab) tab.classList.toggle('has-data',!!hasData);
+  });
+}
+
+function closeCellModal(){ document.getElementById('cellOverlay').classList.remove('open'); currentEditDate=null; }
+
+function togglePorridge(mk){
+  const btn=document.getElementById('porridgeToggle-'+mk);
+  const det=document.getElementById('porridgeDetail-'+mk);
+  const on=btn.classList.toggle('on');
+  btn.textContent=on?'✓ 미음 추가됨':'+ 미음 추가';
+  det.style.display=on?'block':'none';
+}
+
+function toggleGrain(el, mk){ el.classList.toggle('sel'); }
+
+function addCustomGrain(mk){
+  const inp=document.getElementById('customGrain-'+mk);
+  const val=inp.value.trim(); if(!val) return;
+  const grid=document.getElementById('grainGrid-'+mk);
+  // Check not duplicate
+  if(Array.from(grid.querySelectorAll('.grain-btn')).some(b=>b.dataset.grain===val)){
+    inp.value=''; return;
+  }
+  const btn=document.createElement('button');
+  btn.className='grain-btn sel'; btn.dataset.grain=val;
+  btn.textContent=val; btn.onclick=()=>btn.classList.toggle('sel');
+  grid.appendChild(btn); inp.value='';
+}
+
+function toggleMeatBtn(el, mk){
+  el.classList.toggle('sel');
+  const has=document.querySelectorAll(`#meatGrid-${mk} .grain-btn.sel`).length>0;
+  document.getElementById('meatGramRow-'+mk).style.display=has?'flex':'none';
+}
+
+function updateFruitGramRow(mk){
+  const has=document.querySelectorAll(`#fruitGrid-${mk} .opt.sel`).length>0;
+  document.getElementById('fruitGramRow-'+mk).classList.toggle('show',has);
+}
+
+function showCustomFruit(mk){ document.getElementById('customFruitRow-'+mk).classList.add('show'); document.getElementById('customFruitInp-'+mk).focus(); }
+function hideCustomFruit(mk){ document.getElementById('customFruitRow-'+mk).classList.remove('show'); document.getElementById('customFruitInp-'+mk).value=''; }
+
+function confirmCustomFruit(mk){
+  const inp=document.getElementById('customFruitInp-'+mk);
+  const name=inp.value.trim(); if(!name) return;
+  if(!appData.customFruits) appData.customFruits=[];
+  if(!appData.customFruits.some(f=>f.name===name)){
+    appData.customFruits.push({name,custom:true});
+    saveLocal();
+  }
+  // Rebuild and select
+  buildFruitGrid(mk);
+  document.querySelectorAll(`#fruitGrid-${mk} .opt`).forEach(el=>{ if(el.dataset.name===name) el.classList.add('sel'); });
+  updateFruitGramRow(mk);
+  hideCustomFruit(mk);
+}
+
+function readMealFromForm(mk){
+  const meal={};
+  if(document.getElementById('porridgeToggle-'+mk).classList.contains('on')){
+    const grains=Array.from(document.querySelectorAll(`#grainGrid-${mk} .grain-btn.sel`)).map(b=>b.dataset.grain);
+    meal.porridge={
+      grains,
+      ratio:parseInt(document.getElementById('porridgeRatio-'+mk).value),
+      grams:document.getElementById('porridgeGrams-'+mk).value?parseInt(document.getElementById('porridgeGrams-'+mk).value):null
+    };
+  }
+  const meats=Array.from(document.querySelectorAll(`#meatGrid-${mk} .grain-btn.sel`)).map(el=>({
+    type:el.dataset.meat,
+    grams:document.getElementById('meatGrams-'+mk).value?parseInt(document.getElementById('meatGrams-'+mk).value):null
+  }));
+  if(meats.length) meal.meat=meats;
+  const fruits=Array.from(document.querySelectorAll(`#fruitGrid-${mk} .opt.sel`)).map(el=>({name:el.dataset.name}));
+  if(fruits.length){
+    meal.fruits=fruits;
+    const fg=document.getElementById('fruitGrams-'+mk).value;
+    if(fg) meal.fruitGrams=parseInt(fg);
+  }
+  const allergy=Array.from(document.querySelectorAll(`#allergyGrid-${mk} .opt.sel`)).map(el=>({name:el.dataset.name}));
+  if(allergy.length) meal.allergy=allergy;
+  const memo=document.getElementById('mealMemo-'+mk).value.trim();
+  if(memo) meal.memo=memo;
+  return meal;
+}
+
+function mealHasData(meal){ return meal.porridge||meal.meat?.length||meal.fruits?.length||meal.allergy?.length||meal.memo; }
+
+function saveCell(){
+  if(!currentEditDate) return;
+  const entry={ meals:{} };
+  MEAL_KEYS.forEach(mk=>{ const m=readMealFromForm(mk); if(mealHasData(m)) entry.meals[mk]=m; });
+  const memo=document.getElementById('cellMemo').value.trim();
+  if(memo) entry.memo=memo;
+  const hasAnything=Object.keys(entry.meals).length||entry.memo;
+  if(hasAnything){ appData.entries[currentEditDate]=entry; }
+  else { delete appData.entries[currentEditDate]; }
+  saveLocal(); renderCalendar(); updateNoticeBoard(); closeCellModal();
+  showToast('저장됐어요');
+}
+
+function clearCell(){
+  if(!currentEditDate) return;
+  if(!confirm('이 날의 기록을 모두 지울까요?')) return;
+  delete appData.entries[currentEditDate];
+  saveLocal(); renderCalendar(); updateNoticeBoard(); closeCellModal();
+  showToast('삭제됐어요');
+}
+
+function copyCell(){
+  if(!currentEditDate) return;
+  clipboard=JSON.parse(JSON.stringify(appData.entries[currentEditDate]||{}));
+  showToast(`${currentEditDate} 복사됨`);
+}
+
+function copyCellDate(ds){
+  clipboard=JSON.parse(JSON.stringify(appData.entries[ds]||{}));
+  // Highlight all cells for paste
+  document.querySelectorAll('.cal-cell:not(.view-only)').forEach(c=>{
+    if(c.dataset.date!==ds) c.classList.add('paste-ready');
+  });
+  showToast('붙여넣을 날짜를 클릭하세요');
+  // Override onclick for paste mode
+  const orig={};
+  document.querySelectorAll('.cal-cell.paste-ready').forEach(c=>{
+    orig[c.dataset.date]=c.onclick;
+    c.onclick=(e)=>{
+      e.stopPropagation();
+      applyPaste(c.dataset.date);
+      document.querySelectorAll('.cal-cell.paste-ready').forEach(cc=>{ cc.classList.remove('paste-ready'); cc.onclick=orig[cc.dataset.date]; });
+    };
+  });
+}
+
+function pasteCell(){
+  if(!clipboard||!currentEditDate) return;
+  const pasted=JSON.parse(JSON.stringify(clipboard));
+  MEAL_KEYS.forEach(mk=>{
+    const meal=(pasted.meals&&pasted.meals[mk])||{};
+    loadMealIntoForm(mk, meal);
+  });
+  document.getElementById('cellMemo').value=pasted.memo||'';
+  updateMealTabBadges(pasted);
+  showToast('붙여넣기됐어요');
+}
+
+function applyPaste(ds){
+  if(!clipboard) return;
+  appData.entries[ds]=JSON.parse(JSON.stringify(clipboard));
+  saveLocal(); renderCalendar();
+  showToast(`${ds} 에 붙여넣었어요`);
+}
+
+// ═══ AUTH ═══
+function showPwModal(){ document.getElementById('pwInput').value=''; document.getElementById('pwErr').textContent=''; document.getElementById('pwOverlay').classList.add('open'); setTimeout(()=>document.getElementById('pwInput').focus(),100); }
+function closePwModal(){ document.getElementById('pwOverlay').classList.remove('open'); }
+function checkPw(){
+  if(document.getElementById('pwInput').value===PASSWORD){
+    isEditMode=true; localStorage.setItem(AUTH_KEY,JSON.stringify({exp:Date.now()+7*24*60*60*1000}));
+    updateAuthUI(); renderCalendar(); closePwModal(); showToast('수정 모드 활성화 ✏');
+  } else {
+    document.getElementById('pwErr').textContent='비밀번호가 틀렸어요';
+    document.getElementById('pwInput').value=''; document.getElementById('pwInput').focus();
+  }
+}
+function logout(){ isEditMode=false; localStorage.removeItem(AUTH_KEY); updateAuthUI(); renderCalendar(); showToast('잠금됐어요'); }
+function updateAuthUI(){
+  document.getElementById('editBadge').style.display=isEditMode?'inline-flex':'none';
+  document.getElementById('editBtn').style.display=isEditMode?'none':'inline-flex';
+  document.getElementById('logoutBtn').style.display=isEditMode?'inline-flex':'none';
+}
+
+// ═══ SETTINGS ═══
+function showSettings(){
+  document.getElementById('setBirthDate').value=settings.birthDate||'';
+  document.getElementById('setIyusikStart').value=settings.iyusikStartDate||'';
+  document.getElementById('setCity').value=settings.city||'Seoul';
+  document.getElementById('setGhToken').value=settings.github?.token||'';
+  document.getElementById('setGhRepo').value=settings.github?.repo||'';
+  document.getElementById('setGhPath').value=settings.github?.path||'yuha-iyusik.json';
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings(){ document.getElementById('settingsOverlay').classList.remove('open'); }
+function saveSettings(){
+  settings.birthDate=document.getElementById('setBirthDate').value||'';
+  settings.iyusikStartDate=document.getElementById('setIyusikStart').value||'';
+  settings.city=document.getElementById('setCity').value||'Seoul';
+  settings.github={token:document.getElementById('setGhToken').value,repo:document.getElementById('setGhRepo').value,path:document.getElementById('setGhPath').value||'yuha-iyusik.json'};
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));
+  closeSettings(); updateNoticeBoard(); fetchWeather(); renderCalendar();
+  showToast('설정 저장됐어요');
+}
+
+// ═══ NOTEPAD ═══
+function notepadChanged(){ notepadDirty=true; }
+function saveNotepad(){
+  appData.notepad=document.getElementById('notepadTa').value;
+  saveLocal(); notepadDirty=false;
+  showToast('메모장 저장됐어요');
+}
+
+// ═══ GITHUB LOAD ═══
+async function loadFromGithub(){
+  let repo=settings.github?.repo, path=settings.github?.path||'yuha-iyusik.json', token=settings.github?.token;
+  if(!repo){ const h=window.location.hostname; if(h.endsWith('.github.io')){ const o=h.replace('.github.io',''); const p=window.location.pathname.split('/').filter(x=>x); if(p.length) repo=`${o}/${p[0]}`; } }
+  if(!repo) return false;
+  const [owner,repoName]=repo.split('/'); if(!owner||!repoName) return false;
+  try{
+    const headers={'Accept':'application/vnd.github.v3+json'}; if(token) headers['Authorization']=`token ${token}`;
+    const res=await fetch(`https://api.github.com/repos/${owner}/${repoName}/contents/${path}`,{headers});
+    if(!res.ok) return false;
+    const j=await res.json();
+    const parsed=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))));
+    if(parsed.entries){
+      appData={entries:parsed.entries,notepad:parsed.notepad||'',customFruits:parsed.customFruits||[]};
+      if(parsed.settings){ const s=parsed.settings; if(s.birthDate) settings.birthDate=s.birthDate; if(s.iyusikStartDate) settings.iyusikStartDate=s.iyusikStartDate; if(s.city) settings.city=s.city; if(s.github) settings.github={token:settings.github?.token||'',...s.github}; }
+      saveLocal(); localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings)); return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+// ═══ GITHUB SAVE ═══
+async function saveToGithub(){
+  if(!settings.github?.token||!settings.github?.repo){ showSettings(); showToast('먼저 GitHub 설정을 해주세요'); return; }
+  if(notepadDirty){ appData.notepad=document.getElementById('notepadTa').value; notepadDirty=false; }
+  saveLocal();
+  const {token,repo,path}=settings.github;
+  const [owner,repoName]=repo.split('/'); if(!owner||!repoName){ showToast('저장소를 owner/repo 형식으로'); return; }
+  const saveData={entries:appData.entries,notepad:appData.notepad,customFruits:appData.customFruits,settings:{birthDate:settings.birthDate,iyusikStartDate:settings.iyusikStartDate,city:settings.city,github:{repo:settings.github.repo,path:settings.github.path}}};
+  const content=btoa(unescape(encodeURIComponent(JSON.stringify(saveData,null,2))));
+  const apiUrl=`https://api.github.com/repos/${owner}/${repoName}/contents/${path}`;
+  const headers={'Authorization':`token ${token}`,'Content-Type':'application/json'};
+  try{
+    showToast('GitHub에 저장 중...');
+    let sha=''; try{ const r=await fetch(apiUrl,{headers}); if(r.ok){ const j=await r.json(); sha=j.sha||''; } }catch(e){}
+    const body={message:'Update Yuha iyusik plan',content}; if(sha) body.sha=sha;
+    const res=await fetch(apiUrl,{method:'PUT',headers,body:JSON.stringify(body)});
+    showToast(res.ok?'GitHub에 저장됐어요 💾':'저장 실패: '+(await res.json()).message);
+  }catch(e){ showToast('저장 실패: 네트워크 오류'); }
+}
+
+// ═══ NOTICE BOARD ═══
+function updateNoticeBoard(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const ts=dateStr(today);
+  document.getElementById('todayDate').textContent=`${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일 (${DAY_NAMES[today.getDay()]})${KR_HOLIDAYS[ts]?' · '+KR_HOLIDAYS[ts]:''}`;
+  if(settings.birthDate){
+    const birth=parseDate(settings.birthDate);
+    const diff=Math.floor((today-birth)/(1000*60*60*24));
+    document.getElementById('ddayNum').textContent=`D+${diff}`;
+    const months=Math.floor(diff/30.44);
+    document.getElementById('ddayLbl').textContent=`(${months}개월)`;
+    document.getElementById('ageLine').innerHTML=`생후 ${months<12?months+'개월':Math.floor(months/12)+'세 '+months%12+'개월'}<br><span style="font-size:.6rem;color:var(--t3)">${diff}일째</span>`;
+    updateTips(months);
+  }
+  // Notepad
+  document.getElementById('notepadTa').value=appData.notepad||'';
+  // Foods
+  const allFoods=new Set();
+  Object.values(appData.entries).forEach(e=>{
+    MEAL_KEYS.forEach(mk=>{ const m=e.meals&&e.meals[mk]; if(!m) return; if(m.porridge) allFoods.add('미음('+(m.porridge.grains||[m.porridge.grain]).filter(Boolean).join('+')+')'); (m.meat||[]).forEach(mt=>allFoods.add(mt.type)); (m.fruits||[]).forEach(f=>allFoods.add(f.name)); (m.allergy||[]).forEach(a=>allFoods.add(a.name)); });
+    if(e.porridge) allFoods.add('미음'); (e.meat||[]).forEach(m=>allFoods.add(m.type)); (e.fruits||[]).forEach(f=>allFoods.add(f.name)); (e.allergy||[]).forEach(a=>allFoods.add(a.name));
+  });
+  document.getElementById('foodTotal').textContent=`총 ${allFoods.size}가지`;
+  const fc=document.getElementById('foodChips'); fc.innerHTML='';
+  [...allFoods].sort().forEach(f=>{ const c=document.createElement('span'); c.className='f-chip'; c.textContent=f; fc.appendChild(c); });
+}
+
+function updateTips(months){
+  const tips=months<4?['아직 모유·분유만으로 충분해요','4~6개월부터 이유식 준비를 시작해요']:months<6?['이유식 시작 준비 단계예요','쌀미음부터 한 가지씩 시도해요','처음엔 5~10g 소량만 시작해요']:months<8?['초기 이유식: 10배죽으로 시작해요','채소를 한 가지씩 추가해보세요','소고기도 서서히 도입해요']:months<10?['중기 이유식: 7~8배죽으로 점도를 높여요','다양한 채소와 단백질을 골고루','하루 2회 식사로 늘려갈 수 있어요']:months<12?['후기 이유식: 5~6배죽 또는 진밥으로','손가락 음식(핑거푸드)을 시도해봐요','하루 3회 식사 패턴을 만들어가요']:['완료기: 유아식으로 전환할 시기예요','가족과 비슷한 음식을 부드럽게 조리해요','알레르기 테스트를 마무리해요'];
+  document.getElementById('tipItems').innerHTML=tips.map(t=>`<li>${t}</li>`).join('');
+}
+
+// ═══ WEATHER ═══
+const WMO_ICONS={0:'☀️',1:'🌤',2:'⛅',3:'☁️',51:'🌦',61:'🌧',71:'🌨',80:'🌦',95:'⛈'};
+const WMO_DESC={0:'맑음',1:'대체로 맑음',2:'구름 약간',3:'흐림',51:'이슬비',61:'비',71:'눈',80:'소나기',95:'뇌우'};
+async function fetchWeather(){
+  try{
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780&current=temperature_2m,weather_code&timezone=Asia/Seoul');
+    if(r.ok){ const d=await r.json(); const c=d.current; document.getElementById('wIcon').textContent=WMO_ICONS[c.weather_code]||'🌡'; document.getElementById('wTemp').textContent=Math.round(c.temperature_2m)+'°C'; document.getElementById('wDesc').textContent=WMO_DESC[c.weather_code]||''; }
+    const a=await fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=37.5665&longitude=126.9780&current=pm2_5&timezone=Asia/Seoul');
+    if(a.ok){ const d=await a.json(); const pm=d.current?.pm2_5; if(pm!=null){ const[cls,lbl]=pm<=15?['d-good','좋음']:pm<=35?['d-moderate','보통']:pm<=75?['d-bad','나쁨']:['d-very-bad','매우 나쁨']; document.getElementById('dustRow').innerHTML=`<span class="d-badge ${cls}">미세먼지 ${Math.round(pm)}㎍/m³ · ${lbl}</span>`; } }
+  }catch(e){ document.getElementById('wDesc').textContent='날씨 불러오기 실패'; }
+}
+
+// ═══ PRINT ═══
+function printCal(){ window.print(); }
+
+// ═══ TOAST ═══
+let toastTimer;
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2500); }
+
+// ═══ INIT ═══
+(async function init(){
+  loadAll(); updateAuthUI(); renderCalendar(); updateNoticeBoard(); fetchWeather();
+  const loaded=await loadFromGithub();
+  if(loaded){ renderCalendar(); updateNoticeBoard(); showToast('☁️ GitHub에서 불러왔어요'); }
+})();
+</script>
+</body>
+</html>
